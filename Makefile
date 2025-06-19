@@ -1,4 +1,4 @@
-.PHONY: build build-dev build-prod deploy deploy-local deploy-local-fast deploy-local-optimized deploy-aws health-check health-check-local clean clean-local load-test load-test-advanced load-test-stress monitor-scaling setup-hpa check-hpa install-metrics fix-hpa terraform-init terraform-plan terraform-apply terraform-destroy setup-aws setup-backend
+.PHONY: build build-dev build-prod deploy deploy-local deploy-local-fast deploy-local-optimized deploy-aws health-check health-check-local clean clean-local load-test-stress load-test-advanced monitor-scaling setup-hpa check-hpa install-metrics fix-hpa terraform-init terraform-plan terraform-apply terraform-destroy setup-aws setup-backend
 
 # Build Docker image (production - includes model)
 build: build-prod
@@ -87,6 +87,10 @@ clean-aws:
 load-test-stress:
 	@echo "🔥 Running stress test..."
 	@./scripts/load-test-stress.sh
+
+load-test-advanced:
+	@echo "🚀 Running advanced load test with monitoring..."
+	@./scripts/load-test-stress.sh http://localhost:8000 100 60 5 advanced
 
 monitor-scaling:
 	@echo "📊 Monitoring auto-scaling..."

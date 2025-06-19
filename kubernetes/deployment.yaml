@@ -50,12 +50,16 @@ spec:
             port: 8000
           initialDelaySeconds: 300
           periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /
             port: 8000
           initialDelaySeconds: 180
           periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 3
         startupProbe:
           httpGet:
             path: /

@@ -105,16 +105,16 @@ spec:
             path: /
             port: 8000
           initialDelaySeconds: 60
-          periodSeconds: 15
-          timeoutSeconds: 5
+          periodSeconds: 20
+          timeoutSeconds: 10
           failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /
             port: 8000
           initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 10
           failureThreshold: 3
         startupProbe:
           httpGet:
@@ -186,7 +186,7 @@ echo "  - View logs: kubectl logs -f deployment/statista-api -n statista"
 echo "  - Scale app: kubectl scale deployment statista-api --replicas=2 -n statista"
 echo "  - Port forward: kubectl port-forward service/statista-api 8000:8000 -n statista"
 echo "  - Test search: curl -X POST http://localhost:8000/find -H 'Content-Type: application/json' -d '{\"query\": \"statistics\", \"limit\": 5}'"
-echo "  - Load test: make load-test-advanced"
+echo "  - Load test: make load-test-stress"
 echo "  - Delete app: kubectl delete -f kubernetes/local/"
 
 # Clean up temp file

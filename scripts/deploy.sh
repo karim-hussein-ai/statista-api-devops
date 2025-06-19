@@ -133,4 +133,4 @@ echo "  - Monitor application: kubectl logs -f deployment/statista-api -n statis
 echo "  - Check HPA: kubectl get hpa -n statista"
 echo "  - Scale application: kubectl scale deployment statista-api --replicas=3 -n statista"
 echo "  - Access application: $APP_URL"
-echo "  - Load test: make load-test-advanced" 
+echo "  - Load test: make load-test-stress" 
