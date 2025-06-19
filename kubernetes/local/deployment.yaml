@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: statista-api
+  namespace: statista
+  labels:
+    app: statista-api
+    environment: local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: statista-api
+  template:
+    metadata:
+      labels:
+        app: statista-api
+        environment: local
+    spec:
+      containers:
+      - name: statista-api
+        image: statista-api:latest
+        imagePullPolicy: Never  # Use local Docker image
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: statista-api-config
+              key: PORT
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: statista-api-config
+              key: ENVIRONMENT
+        - name: FAST_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: statista-api-config
+              key: FAST_MODE
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 300
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 180
+          periodSeconds: 15
+          timeoutSeconds: 10
+          failureThreshold: 5
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8000
+          failureThreshold: 60
+          periodSeconds: 15 

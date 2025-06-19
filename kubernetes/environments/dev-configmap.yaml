@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: statista-api-config
+  namespace: statista
+data:
+  # Environment variables for development
+  PORT: "8000"
+  FAST_MODE: "true"
+  ENVIRONMENT: "development" 

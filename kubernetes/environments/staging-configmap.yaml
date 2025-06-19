@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: statista-api-config
+  namespace: statista
+data:
+  # Environment variables for staging
+  PORT: "8000"
+  FAST_MODE: "false"
+  ENVIRONMENT: "staging" 

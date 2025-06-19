@@ -1,0 +1,58 @@
+# Stage 1: builder – compute embeddings & build FAISS index
+FROM python:3.11-slim AS builder
+
+# Install build deps
+RUN apt-get update && apt-get install -y curl build-essential swig \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+# Copy only what we need to generate the index
+COPY devops-demo-app/requirements.txt .
+COPY devops-demo-app/statistics.json .
+COPY devops-demo-app/generate_index.py .
+
+# Install Python deps
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Download the model once
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+
+# Generate serialized index + ID map
+# This script should:
+#   - load statistics.json
+#   - encode each text into a numpy array
+#   - build faiss.IndexFlatL2
+#   - save index to index.faiss and ids to ids.npy
+RUN python generate_index.py
+
+# Stage 2: final image
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy runtime bits
+COPY devops-demo-app/requirements.txt .
+COPY devops-demo-app/app.py .
+COPY devops-demo-app/statistics.json .
+
+# Copy prebuilt index artifacts
+COPY --from=builder /build/index.faiss .
+COPY --from=builder /build/ids.npy .
+
+# Copy model cache (so HF_HOME is populated)
+# (optional: copy the whole ~/.cache/huggingface)
+COPY --from=builder /root/.cache /app/.cache
+
+ENV HF_HOME=/app/.cache
+ENV TRANSFORMERS_CACHE=/app/.cache
+ENV SENTENCE_TRANSFORMERS_HOME=/app/.cache
+
+RUN pip install --upgrade pip \
+ && pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/ || exit 1
+
+CMD ["python", "app.py"] 
